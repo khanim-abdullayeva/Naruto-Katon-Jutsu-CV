@@ -1,5 +1,6 @@
 import mediapipe as mp
 import cv2
+import numpy as np
 import time
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
@@ -60,6 +61,37 @@ while True:
                 cv2.putText(
                     frame, f"{finger}: {status}", (50, y_position), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 180, 0),2
                     )
+        
+        mcp = hand[5]
+        pip = hand[6]
+        tip = hand[8]
+
+
+        v1 = (mcp.x - pip.x, mcp.y - pip.y)
+        v2 = (tip.x - pip.x, tip.y - pip.y)
+
+        dot_product = np.dot(v1, v2)
+
+        length_v1 = np.linalg.norm(v1)
+        length_v2 = np.linalg.norm(v2)
+
+        denominator = length_v1 * length_v2
+
+        if denominator > 0:
+            cos_theta = dot_product / denominator
+            cos_theta = np.clip(cos_theta, -1, 1)
+            angle = np.degrees(np.arccos(cos_theta))
+        else:
+            angle = None
+
+        if angle >= 160:
+            status = "Extended"
+        else:
+            status = "Bent"
+        
+        cv2.putText(frame, f"Index: {status} | Angle: {angle}", (50, 240), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0),2)
+        
+
             
         for connection in connections:
             start_idx = connection.start
@@ -93,3 +125,6 @@ while True:
         break
 cap.release()
 cv2.destroyAllWindows()
+
+
+
