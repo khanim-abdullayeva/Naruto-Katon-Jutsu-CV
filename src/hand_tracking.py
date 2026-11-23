@@ -38,58 +38,52 @@ while True:
             py = int(landmark.y * height)
             cv2.circle(frame, (px,py), 4, (0, 255, 0), -1)
             
-            fingers = {
-                "Index" : (8, 6),
-                "Middle": (12, 10),
-                "Ring" : (16,14),
-                "Pinky" : (20, 18)
-                }
+        fingers = {
+            "Index": (5, 6, 8),
+            "Middle": (9, 10, 12),
+            "Ring": (13, 14, 16),
+            "Pinky": (17, 18, 20)
+            }
             
-            for i, finger in enumerate(fingers):
-                tip_idx, pip_idx = fingers[finger]
-
-                tip_y = hand[tip_idx].y
-                pip_y = hand[pip_idx].y
-
-                if tip_y < pip_y:
-                    status = "Extended"
-                else:
-                    status = "Bent"
-
-                y_position = 120 + i * 30
-
-                cv2.putText(
-                    frame, f"{finger}: {status}", (50, y_position), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 180, 0),2
-                    )
-        
-        mcp = hand[5]
-        pip = hand[6]
-        tip = hand[8]
+        for i, (finger, indices) in enumerate(fingers.items()): 
+            mcp_idx, pip_idx, tip_idx = indices
+                
+            mcp = hand[mcp_idx]
+            pip = hand[pip_idx]
+            tip = hand[tip_idx]
 
 
-        v1 = (mcp.x - pip.x, mcp.y - pip.y)
-        v2 = (tip.x - pip.x, tip.y - pip.y)
+            v1 = (mcp.x - pip.x, mcp.y - pip.y)
+            v2 = (tip.x - pip.x, tip.y - pip.y)
 
-        dot_product = np.dot(v1, v2)
+            dot_product = np.dot(v1, v2)   
 
-        length_v1 = np.linalg.norm(v1)
-        length_v2 = np.linalg.norm(v2)
+            length_v1 = np.linalg.norm(v1)
+            length_v2 = np.linalg.norm(v2)
 
-        denominator = length_v1 * length_v2
+            denominator = length_v1 * length_v2
 
-        if denominator > 0:
-            cos_theta = dot_product / denominator
-            cos_theta = np.clip(cos_theta, -1, 1)
-            angle = np.degrees(np.arccos(cos_theta))
-        else:
-            angle = None
+            if denominator > 0:
+                cos_theta = dot_product / denominator
+                cos_theta = np.clip(cos_theta, -1, 1)
+                angle = np.degrees(np.arccos(cos_theta))
+                
+            else:
+                angle = None
 
-        if angle >= 160:
-            status = "Extended"
-        else:
-            status = "Bent"
-        
-        cv2.putText(frame, f"Index: {status} | Angle: {angle}", (50, 240), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0),2)
+            if angle is None:
+                status = "Unknown"
+                text = f"{finger}: {status}"
+            elif angle >= 160:
+                status = "Extended"
+                text = f"{finger}: {status} | {angle:.1f}"
+            else:
+                status = "Bent"
+                text = f"{finger}: {status} | {angle:.1f}"
+                
+            y_position = 120 + i * 30
+
+            cv2.putText(frame, text, (50, y_position), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0),2)
         
 
             
