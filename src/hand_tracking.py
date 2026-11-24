@@ -35,6 +35,15 @@ while True:
     
     for hand_idx, hand in enumerate(result.hand_landmarks):
         hand_label = result.handedness[hand_idx][0].category_name
+        
+        if hand_label == "Left":
+            x_position = 20
+        else:
+            x_position = width // 2 + 20
+
+        cv2.putText(frame, f"{hand_label} hand", (x_position, 110), 
+            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2 )
+
         for landmark in hand:
             px = int(landmark.x * width)
             py = int(landmark.y * height)
@@ -71,6 +80,7 @@ while True:
             thumb_ratio = thumb_distance / palm_size
         else:
             thumb_ratio = None
+
             
         finger_states = {}
 
@@ -82,8 +92,8 @@ while True:
             tip = hand[tip_idx]
 
 
-            v1 = (mcp.x - pip.x, mcp.y - pip.y)
-            v2 = (tip.x - pip.x, tip.y - pip.y)
+            v1 = ((mcp.x - pip.x) * width, (mcp.y - pip.y) * height)
+            v2 = ((tip.x - pip.x) * width, (tip.y - pip.y) * height)
 
             dot_product = np.dot(v1, v2)   
 
@@ -124,11 +134,12 @@ while True:
                 text = f"{finger}: {status} | {angle:.1f}"
             else:
                 text = f"{finger}: {status}"
-                
-            y_position = 120 + i * 30
 
-            cv2.putText(frame, text, (50, y_position), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0),2)
-        
+                
+            y_position = 140 + i * 30
+
+            cv2.putText(frame, text, (x_position, y_position), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0),2)
+            
         
         hands_states[hand_label] = finger_states   
         
