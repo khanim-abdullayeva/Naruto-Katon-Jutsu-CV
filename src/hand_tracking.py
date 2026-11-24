@@ -39,11 +39,36 @@ while True:
             cv2.circle(frame, (px,py), 4, (0, 255, 0), -1)
             
         fingers = {
+            "Thumb" : (1, 2, 4),
             "Index": (5, 6, 8),
             "Middle": (9, 10, 12),
             "Ring": (13, 14, 16),
             "Pinky": (17, 18, 20)
             }
+        
+        thumb_tip = hand[4]
+        index_mcp = hand[5]
+        wrist = hand[0]
+        middle_mcp = hand[9]
+        
+        thumb_vector = (
+        (thumb_tip.x - index_mcp.x) * width,
+        (thumb_tip.y - index_mcp.y) * height
+        )
+        
+        thumb_distance = np.linalg.norm(thumb_vector)
+        
+        palm_vector = (
+        (middle_mcp.x - wrist.x) * width,
+        (middle_mcp.y - wrist.y) * height
+        )
+        
+        palm_size = np.linalg.norm(palm_vector)
+        
+        if palm_size > 0:
+            thumb_ratio = thumb_distance / palm_size
+        else:
+            thumb_ratio = None
             
         for i, (finger, indices) in enumerate(fingers.items()): 
             mcp_idx, pip_idx, tip_idx = indices
@@ -63,6 +88,7 @@ while True:
 
             denominator = length_v1 * length_v2
 
+
             if denominator > 0:
                 cos_theta = dot_product / denominator
                 cos_theta = np.clip(cos_theta, -1, 1)
@@ -73,19 +99,31 @@ while True:
 
             if angle is None:
                 status = "Unknown"
-                text = f"{finger}: {status}"
+
+            elif finger == "Thumb":
+                if thumb_ratio is None:
+                    status = "Unknown"
+                elif angle >= 160 and thumb_ratio >= 0.5:
+                    status = "Extended"
+                else:
+                    status = "Bent"
+
             elif angle >= 160:
                 status = "Extended"
-                text = f"{finger}: {status} | {angle:.1f}"
             else:
                 status = "Bent"
+
+            if angle is not None:
                 text = f"{finger}: {status} | {angle:.1f}"
+            else:
+                text = f"{finger}: {status}"
                 
             y_position = 120 + i * 30
 
             cv2.putText(frame, text, (50, y_position), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0),2)
         
-
+        
+        
             
         for connection in connections:
             start_idx = connection.start
