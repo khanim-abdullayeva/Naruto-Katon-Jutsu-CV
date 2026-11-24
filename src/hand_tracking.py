@@ -31,8 +31,10 @@ while True:
     timestamp_ms = int((time.perf_counter() - start_time) * 1000)
     result = landmarker.detect_for_video(mp_image, timestamp_ms)
     connections = HandLandmarksConnections.HAND_CONNECTIONS
+    hands_states = {}
     
-    for hand in result.hand_landmarks:
+    for hand_idx, hand in enumerate(result.hand_landmarks):
+        hand_label = result.handedness[hand_idx][0].category_name
         for landmark in hand:
             px = int(landmark.x * width)
             py = int(landmark.y * height)
@@ -70,6 +72,8 @@ while True:
         else:
             thumb_ratio = None
             
+        finger_states = {}
+
         for i, (finger, indices) in enumerate(fingers.items()): 
             mcp_idx, pip_idx, tip_idx = indices
                 
@@ -112,6 +116,9 @@ while True:
                 status = "Extended"
             else:
                 status = "Bent"
+        
+            finger_states[finger] = status
+    
 
             if angle is not None:
                 text = f"{finger}: {status} | {angle:.1f}"
@@ -123,8 +130,8 @@ while True:
             cv2.putText(frame, text, (50, y_position), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0),2)
         
         
+        hands_states[hand_label] = finger_states   
         
-            
         for connection in connections:
             start_idx = connection.start
             end_idx = connection.end
@@ -140,7 +147,7 @@ while True:
         
             cv2.line(frame, (start_x,start_y), (end_x, end_y), (255, 255, 255), 2)
 
-
+    print(hands_states)
     cv2.putText(frame,"Katon Gokakyu No Jutsu", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1)
     current_time = time.perf_counter()
     delta_time = current_time - prev_time
