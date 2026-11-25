@@ -14,7 +14,24 @@ while True:
 
 data_path = os.path.join("data")
 save_path = os.path.join(data_path, choice)
-print(save_path)
+existing_files = os.listdir(save_path)
+
+image_numbers = []
+
+for image in existing_files:
+    if image.endswith(".jpg"):
+        file_extension = os.path.splitext(image)
+        file_name_num = file_extension[0].split("_")
+        file_num = int(file_name_num[1])
+        image_numbers.append(file_num)
+
+print(image_numbers)
+
+if len(image_numbers) == 0:
+    image_count = 0
+else:
+    image_count = max(image_numbers) + 1
+
 
 cap = cv2.VideoCapture(0)
 print(cap.isOpened())
@@ -22,7 +39,6 @@ print(cap.isOpened())
 if not cap.isOpened():
     sys.exit()
 
-image_count = 0
 
 while True:
     ret, frame = cap.read()
@@ -48,6 +64,9 @@ while True:
             image_count += 1
     elif key == ord("q"):
         break
+
+print(image_count)
+print(image_numbers)
 
 cap.release()
 cv2.destroyAllWindows()
