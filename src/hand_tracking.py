@@ -158,7 +158,17 @@ while True:
         
             cv2.line(frame, (start_x,start_y), (end_x, end_y), (255, 255, 255), 2)
 
-    print(hands_states)
+    if "Left" in hands_states and "Right" in hands_states:
+        cv2.putText(frame, "Both hands detected", (20, height -30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        print(hands_states)   
+    elif "Left" in hands_states:
+        cv2.putText(frame, "Left hand detected", (20, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    elif "Right" in hands_states: 
+        cv2.putText(frame, "Right hand detected", (20, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+    else: 
+        cv2.putText(frame, "No hand detected", (20, height - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
+        
+    
     cv2.putText(frame,"Katon Gokakyu No Jutsu", (50,50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1)
     current_time = time.perf_counter()
     delta_time = current_time - prev_time
