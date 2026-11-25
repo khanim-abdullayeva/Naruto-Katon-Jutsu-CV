@@ -1,6 +1,7 @@
 import cv2
 import sys
 import os
+import time
 
 
 classes = ["snake", "ram", "monkey", "boar", "horse", "tiger", "other"]
@@ -41,6 +42,9 @@ print(cap.isOpened())
 if not cap.isOpened():
     sys.exit()
 
+auto_capture = False
+capture_interval = 1.0
+last_capture_time = 0
 
 while True:
     ret, frame = cap.read()
@@ -50,9 +54,15 @@ while True:
 
     raw_frame = frame.copy()
 
+    if auto_capture == False:
+        status = "Off" 
+    else:
+        status = "On"
+
     cv2.putText(frame, "Dataset Collection", (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
     cv2.putText(frame, f"Class : {choice}", (50, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-    cv2.putText(frame, f"Target count: {target_count} | Total images: {total_images}", (50,90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 200, 0), 1)
+    cv2.putText(frame, f"Target count: {target_count} | Total images: {total_images}", (50, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 200, 0), 1)
+    cv2.putText(frame, f"Auto capture: {status}", (50, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
     cv2.imshow("Dataset Collection", frame)
 
     key = cv2.waitKey(1)
@@ -66,9 +76,21 @@ while True:
             print("Image captured")
             image_count += 1
             total_images += 1
+    elif key == ord("a"):
+        auto_capture = True
+        last_capture_time = time.perf_counter()
+    elif key == ord("p"):
+        auto_capture = False
     elif key == ord("q"):
         break
 
+    if auto_capture == True:
+        current_time = time.perf_counter()
+        elapsed_time = current_time - last_capture_time
+
+        if elapsed_time >= capture_interval:
+            print("Auto capture triggered")
+            last_capture_time = current_time
 
 print(image_count)
 print(image_numbers)
