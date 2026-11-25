@@ -1,5 +1,6 @@
 import cv2
 import sys
+import os
 
 
 classes = ["snake", "ram", "monkey", "boar", "horse", "tiger", "other"]
@@ -10,6 +11,11 @@ while True:
         print("Please choose the correct class")
     else:
         break
+
+data_path = os.path.join("data")
+save_path = os.path.join(data_path, choice)
+print(os.path.exists(save_path))
+print(save_path)
 
 cap = cv2.VideoCapture(0)
 print(cap.isOpened())
@@ -33,3 +39,5 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
+
+
