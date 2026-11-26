@@ -68,26 +68,32 @@ while True:
     key = cv2.waitKey(1)
     
     if key == ord("s"):
-        filename = f"{choice}_{image_count}.jpg"
-        image_path = os.path.join(save_path, filename)
-        success = cv2.imwrite(image_path, raw_frame)
+        if total_images < target_count:
+            filename = f"{choice}_{image_count}.jpg"
+            image_path = os.path.join(save_path, filename)
+            success = cv2.imwrite(image_path, raw_frame)
 
-        if success:
-            print("Image captured manually")
-            image_count += 1
-            total_images += 1
+            if success:
+                print("Image captured manually")
+                image_count += 1
+                total_images += 1
+        else:
+            print("Limit reached")
     elif key == ord("a"):
-        auto_capture = True
-        last_capture_time = time.perf_counter()
+        if total_images < target_count:
+            auto_capture = True
+            last_capture_time = time.perf_counter()
+        else:
+            auto_capture = False
+            print("Limit reached")
     elif key == ord("p"):
         auto_capture = False
     elif key == ord("q"):
         break
 
-    if auto_capture == True:
+    if auto_capture == True and total_images < target_count:
         current_time = time.perf_counter()
         elapsed_time = current_time - last_capture_time
-
         if elapsed_time >= capture_interval:
             filename = f"{choice}_{image_count}.jpg"
             image_path = os.path.join(save_path, filename)
@@ -98,11 +104,12 @@ while True:
                 print("Image captured automatically")
                 image_count += 1
                 total_images += 1
+    if total_images >= target_count:
+        auto_capture = False
 
 print(image_count)
 print(image_numbers)
 
 cap.release()
 cv2.destroyAllWindows()
-
 
