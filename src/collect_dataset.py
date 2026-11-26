@@ -3,6 +3,13 @@ import sys
 import os
 import time
 
+def save_image(choice, image_count, save_path, raw_frame):
+    filename = f"{choice}_{image_count}.jpg"
+    image_path = os.path.join(save_path, filename)
+    success = cv2.imwrite(image_path, raw_frame)
+    
+    return success
+
 
 classes = ["snake", "ram", "monkey", "boar", "horse", "tiger", "other"]
 
@@ -69,10 +76,7 @@ while True:
     
     if key == ord("s"):
         if total_images < target_count:
-            filename = f"{choice}_{image_count}.jpg"
-            image_path = os.path.join(save_path, filename)
-            success = cv2.imwrite(image_path, raw_frame)
-
+            success =  save_image(choice, image_count, save_path, raw_frame)
             if success:
                 print("Image captured manually")
                 image_count += 1
@@ -95,9 +99,7 @@ while True:
         current_time = time.perf_counter()
         elapsed_time = current_time - last_capture_time
         if elapsed_time >= capture_interval:
-            filename = f"{choice}_{image_count}.jpg"
-            image_path = os.path.join(save_path, filename)
-            success = cv2.imwrite(image_path, raw_frame)
+            success = save_image(choice, image_count, save_path, raw_frame)
             last_capture_time = current_time
 
             if success:
@@ -105,7 +107,9 @@ while True:
                 image_count += 1
                 total_images += 1
     if total_images >= target_count:
-        auto_capture = False
+        if auto_capture == True:
+            print("Limit reached")
+            auto_capture = False
 
 print(image_count)
 print(image_numbers)
