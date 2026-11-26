@@ -73,7 +73,7 @@ while True:
         success = cv2.imwrite(image_path, raw_frame)
 
         if success:
-            print("Image captured")
+            print("Image captured manually")
             image_count += 1
             total_images += 1
     elif key == ord("a"):
@@ -89,8 +89,15 @@ while True:
         elapsed_time = current_time - last_capture_time
 
         if elapsed_time >= capture_interval:
-            print("Auto capture triggered")
+            filename = f"{choice}_{image_count}.jpg"
+            image_path = os.path.join(save_path, filename)
+            success = cv2.imwrite(image_path, raw_frame)
             last_capture_time = current_time
+
+            if success:
+                print("Image captured automatically")
+                image_count += 1
+                total_images += 1
 
 print(image_count)
 print(image_numbers)
