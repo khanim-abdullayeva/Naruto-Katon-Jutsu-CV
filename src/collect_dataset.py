@@ -22,6 +22,7 @@ while True:
 
 data_path = os.path.join("data")
 save_path = os.path.join(data_path, choice)
+os.makedirs(save_path, exist_ok = True)
 existing_files = os.listdir(save_path)
 
 image_numbers = []
