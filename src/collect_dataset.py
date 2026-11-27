@@ -38,8 +38,6 @@ for image in existing_files:
                 image_numbers.append(file_num)
         
 
-print(image_numbers)
-
 if len(image_numbers) == 0:
     image_count = 0
 else:
@@ -65,6 +63,7 @@ while True:
         break
 
     raw_frame = frame.copy()
+    image_saved = False
 
     if auto_capture == False:
         status = "Off" 
@@ -84,6 +83,7 @@ while True:
             success =  save_image(choice, image_count, save_path, raw_frame)
             if success:
                 print("Image captured manually")
+                image_saved = True
                 image_count += 1
                 total_images += 1
         else:
@@ -104,20 +104,21 @@ while True:
         current_time = time.perf_counter()
         elapsed_time = current_time - last_capture_time
         if elapsed_time >= capture_interval:
-            success = save_image(choice, image_count, save_path, raw_frame)
-            last_capture_time = current_time
+            if not image_saved:
+                success = save_image(choice, image_count, save_path, raw_frame)
 
-            if success:
-                print("Image captured automatically")
-                image_count += 1
-                total_images += 1
+                if success:
+                    print("Image captured automatically")
+                    image_saved = True
+                    image_count += 1
+                    total_images += 1
+            last_capture_time = current_time
     if total_images >= target_count:
         if auto_capture == True:
             print("Limit reached")
             auto_capture = False
 
 print(image_count)
-print(image_numbers)
 
 cap.release()
 cv2.destroyAllWindows()
