@@ -7,7 +7,8 @@ def save_image(choice, image_count, save_path, raw_frame):
     filename = f"{choice}_{image_count}.jpg"
     image_path = os.path.join(save_path, filename)
     success = cv2.imwrite(image_path, raw_frame)
-    
+    if not success:
+        print("Failed to save image")
     return success
 
 
@@ -36,7 +37,6 @@ for image in existing_files:
                 file_num = int(file_name_num[1])
                 image_numbers.append(file_num)
         
-
 
 print(image_numbers)
 
