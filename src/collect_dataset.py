@@ -29,10 +29,14 @@ image_numbers = []
 
 for image in existing_files:
     if image.endswith(".jpg"):
-        file_extension = os.path.splitext(image)
-        file_name_num = file_extension[0].split("_")
-        file_num = int(file_name_num[1])
-        image_numbers.append(file_num)
+        if "_" in image:
+            file_extension = os.path.splitext(image)
+            file_name_num = file_extension[0].split("_")
+            if file_name_num[1].isdigit():
+                file_num = int(file_name_num[1])
+                image_numbers.append(file_num)
+        
+
 
 print(image_numbers)
 
