@@ -25,9 +25,7 @@ while True:
     else:
         break
 
-data_path = os.path.join("data")
-save_path = os.path.join(data_path, choice)
-session_path = os.path.join(data_path, choice, session)
+session_path = os.path.join("data", choice, session)
 os.makedirs(session_path, exist_ok = True)
 existing_files = os.listdir(session_path)
 
@@ -52,9 +50,9 @@ target_count = 500
 total_images = len(image_numbers)
 
 cap = cv2.VideoCapture(0)
-print(cap.isOpened())
 
 if not cap.isOpened():
+    cap.release()
     sys.exit()
 
 auto_capture = False
