@@ -17,13 +17,17 @@ sessions = ["session_01", "session_02", "session_03"]
 
 while True:
     choice = input("Choose the class (snake, ram, monkey, boar, horse, tiger, other): ").lower().strip()
-    session = input("Enter the session name (session_01, session_02, session_03): ").lower().strip()
     if choice not in classes:
         print("Please choose the correct class")
-    elif session not in sessions:
-        print("Please choose the correct session")
     else:
         break
+while True:
+    session = input("Enter the session name (session_01, session_02, session_03): ").lower().strip()
+    if session not in sessions:
+        print("Please enter the correct session name")
+    else:
+        break
+
 
 session_path = os.path.join("data", choice, session)
 os.makedirs(session_path, exist_ok = True)
