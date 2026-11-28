@@ -3,9 +3,9 @@ import sys
 import os
 import time
 
-def save_image(choice, image_count, save_path, raw_frame):
+def save_image(choice, image_count, session_path, raw_frame):
     filename = f"{choice}_{image_count}.jpg"
-    image_path = os.path.join(save_path, filename)
+    image_path = os.path.join(session_path, filename)
     success = cv2.imwrite(image_path, raw_frame)
     if not success:
         print("Failed to save image")
@@ -13,18 +13,23 @@ def save_image(choice, image_count, save_path, raw_frame):
 
 
 classes = ["snake", "ram", "monkey", "boar", "horse", "tiger", "other"]
+sessions = ["session_01", "session_02", "session_03"]
 
 while True:
-    choice = input("Choose the class (snake, ram, monkey, boar, horse, tiger, other):").lower().strip()
+    choice = input("Choose the class (snake, ram, monkey, boar, horse, tiger, other): ").lower().strip()
+    session = input("Enter the session name (session_01, session_02, session_03): ").lower().strip()
     if choice not in classes:
         print("Please choose the correct class")
+    elif session not in sessions:
+        print("Please choose the correct session")
     else:
         break
 
 data_path = os.path.join("data")
 save_path = os.path.join(data_path, choice)
-os.makedirs(save_path, exist_ok = True)
-existing_files = os.listdir(save_path)
+session_path = os.path.join(data_path, choice, session)
+os.makedirs(session_path, exist_ok = True)
+existing_files = os.listdir(session_path)
 
 image_numbers = []
 
@@ -74,13 +79,14 @@ while True:
     cv2.putText(frame, f"Class : {choice}", (50, 70), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
     cv2.putText(frame, f"Target count: {target_count} | Total images: {total_images}", (50, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 200, 0), 1)
     cv2.putText(frame, f"Auto capture: {status}", (50, 110), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+    cv2.putText(frame, f"Current session: {session}", (430, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1)
     cv2.imshow("Dataset Collection", frame)
 
     key = cv2.waitKey(1)
     
     if key == ord("s"):
         if total_images < target_count:
-            success =  save_image(choice, image_count, save_path, raw_frame)
+            success =  save_image(choice, image_count, session_path, raw_frame)
             if success:
                 print("Image captured manually")
                 image_saved = True
@@ -105,7 +111,7 @@ while True:
         elapsed_time = current_time - last_capture_time
         if elapsed_time >= capture_interval:
             if not image_saved:
-                success = save_image(choice, image_count, save_path, raw_frame)
+                success = save_image(choice, image_count, session_path, raw_frame)
 
                 if success:
                     print("Image captured automatically")
